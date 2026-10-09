@@ -19,7 +19,7 @@ Rules for the whole session:
    if I want to continue.
 
 2. Check that Python 3.10 or newer is installed (`python3 --version`). Install the tool:
-   `pipx install git+<REPO_URL>`. If pipx is missing, use `python3 -m pip install --user git+<REPO_URL>`.
+   `pipx install git+https://github.com/1fc0nfig/logeto-cli`. If pipx is missing, use `python3 -m pip install --user git+https://github.com/1fc0nfig/logeto-cli`.
    Check the install with `logeto --version`.
 
 3. Ask me for the web address where I log in to Logeto, for example
@@ -62,4 +62,3 @@ Rules for the whole session:
    or custom rates yet.
 ````
 
-The maintainer replaces `<REPO_URL>` with the address of the published repository.

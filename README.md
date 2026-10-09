@@ -13,7 +13,7 @@ Open [LLM_QUICKSTART.md](LLM_QUICKSTART.md) and paste its prompt into your AI as
 ## Manual setup
 
 ```
-pipx install git+<REPO_URL>
+pipx install git+https://github.com/1fc0nfig/logeto-cli
 logeto login --url https://mycompany.vykazprace.cz --email me@mycompany.com
 logeto init            # shows your company's form setup and suggests defaults
 logeto init --apply    # saves the suggested contract and activity
