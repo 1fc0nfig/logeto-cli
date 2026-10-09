@@ -21,6 +21,8 @@ logeto init --apply    # saves the suggested contract and activity
 
 `logeto login` asks for the password. On macOS the password goes to the Keychain under the service `logeto-cli`. When the session expires, the tool then logs in again by itself. On other systems, set `LOGETO_PASSWORD` for the automatic login, or run `logeto login` again.
 
+`logeto logout` ends the session on the server and deletes the local cookies. Add `--forget` to also remove the stored password.
+
 If your company uses single sign-on, log in in the browser. In the developer tools, copy one timesheet request as cURL. Then run `logeto cookie --url <address> '<the curl command>'`.
 
 ## Use

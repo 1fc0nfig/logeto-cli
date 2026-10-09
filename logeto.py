@@ -151,6 +151,10 @@ class Session:
             raise LogetoError(f'{path} is not the timesheet page. Check `logeto config base` and `lang`.')
         return final, body
 
+    def clear(self):
+        self.jar.clear()
+        self.save()
+
     def import_cookies(self, header):
         host = urllib.parse.urlparse(self.base).hostname
         for part in header.split(';'):
@@ -189,6 +193,10 @@ def login(sess, quiet=False, password=None):
             return False
         password = getpass.getpass('Password (not echoed): ')
     final, body = sess.request('/Login')
+    if not is_login(final, body):
+        # A half-valid session redirects away from the login page. Start a fresh session.
+        sess.clear()
+        final, body = sess.request('/Login')
     consts = server_constants(body)
     action = re.search(r'<form[^>]*action="([^"]+)"[^>]*id="loginForm"', body) or re.search(r'id="loginForm"[^>]*action="([^"]+)"', body)
     if not action:
@@ -725,9 +733,36 @@ def cmd_login(sess, args):
     if args.account:
         sess.cfg['account'] = args.account
     password = sys.stdin.readline().rstrip('\n') if args.password_stdin else None
+    sess.clear()
     login(sess, password=password)
     where = 'the macOS Keychain' if sys.platform == 'darwin' else 'nowhere (set LOGETO_PASSWORD for automatic re-login)'
     print(f"Logged in to {sess.cfg['base']} as {sess.cfg['email']}. Password stored in {where}.")
+
+
+def logout(sess):
+    """End the session on the server (as the web "log out" link does) and drop the local cookies."""
+    final, body = sess.request(f"/{sess.cfg['lang']}/Login?Logout=1")
+    wf = server_constants(body).get('WebFormsApplicationUrl') or sess.base + '/wf'
+    sess.request(wf.rstrip('/') + '/LoginService', {'logout': '1'})
+    sess.clear()
+
+
+def keychain_delete(cfg):
+    if sys.platform != 'darwin':
+        return False
+    r = subprocess.run(['security', 'delete-generic-password', '-s', KEYCHAIN_SERVICE, '-a', keychain_account(cfg)],
+                       capture_output=True)
+    return r.returncode == 0
+
+
+def cmd_logout(sess, args):
+    if args.local:
+        sess.clear()
+    else:
+        logout(sess)
+    print('Logged out.' + ('' if args.local else ' The server session has ended.'))
+    if args.forget:
+        print('Password removed from the Keychain.' if keychain_delete(sess.cfg) else 'No stored password found.')
 
 
 def cmd_cookie(sess, args):
@@ -841,6 +876,11 @@ def main():
     s.add_argument('--account', help='company account name, only if the login page asks for it')
     s.add_argument('--password-stdin', action='store_true', help='read the password from stdin')
     s.set_defaults(fn=cmd_login)
+
+    s = sub.add_parser('logout', help='end the session')
+    s.add_argument('--local', action='store_true', help='only delete the local cookies, keep the server session')
+    s.add_argument('--forget', action='store_true', help='also remove the stored password from the Keychain')
+    s.set_defaults(fn=cmd_logout)
 
     s = sub.add_parser('cookie', help='use a browser session: paste a Cookie header or a "Copy as cURL" command')
     s.add_argument('cookie', help='cookie header, curl command, or - for stdin')
