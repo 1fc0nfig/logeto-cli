@@ -1,0 +1,8 @@
+__pycache__/
+*.egg-info/
+build/
+dist/
+.venv/
+# Session data lives in ~/.config/logeto, never in the repo.
+cookies.lwp
+*.cookie*

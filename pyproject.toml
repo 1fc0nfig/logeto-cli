@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "logeto-cli"
+version = "0.2.0"
+description = "Unofficial terminal client for Logeto / Výkaz práce timesheets. Not affiliated with Systemart s.r.o."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+keywords = ["logeto", "vykazprace", "timesheet", "cli"]
+
+[project.scripts]
+logeto = "logeto:main"
+
+[tool.setuptools]
+py-modules = ["logeto"]
